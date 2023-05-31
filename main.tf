@@ -1,8 +1,8 @@
 terraform {
     backend "s3" {
-    bucket = "test-sanquest"
-    key    = "terraform_Iac.tfstate"
-    region = "us-east-1"
+    bucket = "musibkt2"
+    key    = "key_terraform.tfstate"
+    region = "ap-south-1"
   }
 }
 
@@ -16,17 +16,12 @@ provider "aws" {
   region  = var.region
 }
 
-#module "aws_security_group" {
-#  source      = "terraform-aws-modules/security-group/aws"
-#  name = "k8s-cluster-sg"
-#}
-
 resource "aws_instance" "controller_linux" {
   ami                         = var.linux_ami_id
-  instance_type               = "t2.large"
+  instance_type               = "t2.micro"
   associate_public_ip_address = true
   subnet_id = var.subnet
-  key_name                    = "ssh-key"
+  key_name                    = "anil"
   root_block_device {
     volume_type           = var.volume_type
     volume_size           = 60
@@ -34,7 +29,7 @@ resource "aws_instance" "controller_linux" {
     encrypted = true
   }
   tags = {
-    Name = "IaC-Infra"
+    Name = "linuxec2-automation"
   }
 }
 
@@ -43,9 +38,9 @@ output "instance_ip_linux_controller" {
   value       = aws_instance.controller_linux.public_ip
 }
 
-resource "aws_security_group" "devops-test1" {
-  name        = "devops-test1"
-  description = "Allow sall traffic"
+resource "aws_security_group" "anilSG2" {
+  name        = "anilSG2"
+  description = "Allows all traffic"
   vpc_id      = var.vpc_id
   ingress {
     from_port   = 0
@@ -60,17 +55,17 @@ resource "aws_security_group" "devops-test1" {
     cidr_blocks = var.cidr_blocks
   }
   tags = {
-    Name = "devops-test1"
+    Name = "anilSG2"
   }
 }
 
 
 output "securitygroup_id" {
-  value = aws_security_group.devops-test1.id
+  value = aws_security_group.anilSG2.id
 }
 
 resource "aws_network_interface_sg_attachment" "controller_sg_attachment" {
-  security_group_id    = aws_security_group.devops-test1.id
+  security_group_id    = aws_security_group.anilSG2.id
   network_interface_id = aws_instance.controller_linux.primary_network_interface_id
 }
 
