@@ -1,0 +1,14 @@
+---
+- hosts: app
+  become: true
+  tasks:
+    - name: Setup nginx conf
+      template:
+        src=nginx.conf.tpl
+        dest=/etc/nginx/nginx.conf
+      notify: restart nginx
+  handlers:
+    - name: restart nginx
+      service:
+        name=nginx
+        state=restarted
